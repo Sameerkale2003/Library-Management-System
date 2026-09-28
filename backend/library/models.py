@@ -39,7 +39,7 @@ class Book(models.Model):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(available_copies__gte=0) & models.Q(available_copies__lte=models.F('total_copies')),
+                condition=models.Q(available_copies__gte=0) & models.Q(available_copies__lte=models.F('total_copies')),
                 name='valid_available_copies_constraint'
             )
         ]
