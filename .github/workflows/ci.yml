@@ -1,5 +1,9 @@
 name: Library Management CI
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: [main]
@@ -75,3 +79,38 @@ jobs:
           context: ./frontend
           push: false
           tags: library-frontend:ci
+
+
+  docker-publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [frontend-build, backend-check, docker-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Django backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/sameerkale2003/library-management-system-backend:latest
+
+      - name: Publish React frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/sameerkale2003/library-management-system-frontend:latest
+
+
+
+
