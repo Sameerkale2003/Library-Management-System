@@ -12,6 +12,8 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
 
   backend:
     build: ./backend
@@ -27,6 +29,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    networks:
+      - app-network
 
   frontend:
     build: ./frontend
@@ -36,6 +40,13 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mysql_data:
